@@ -1,18 +1,10 @@
-FROM node:16.6.2-alpine as builder
-WORKDIR /app
+FROM debian
 
-ADD package.json package.json
-ADD package-lock.json package-lock.json
+RUN apt-get update
+RUN apt-get install -y apache2
+RUN mkdir /var/run/apache2
 
-RUN npm install
+EXPOSE 80
 
-ADD lib lib
-ADD scripts scripts
-ADD tsconfig.json tsconfig.json
-
-RUN npm run build
-
-
-FROM httpd:2.4.48-alpine
-
-COPY --from=builder /app/build/ /usr/local/apache2/htdocs
+CMD [ "sh", "c", \
+      ". /etc/apache2/envvars && apache2 -D FOREGROUND" ]
